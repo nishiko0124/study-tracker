@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学習進捗トラッカー</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
+        h1, h2 { color: #333; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .material { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        .target-date { font-size: 0.9em; color: #888; font-weight: normal; margin-left: 10px; }
+        .progress-bar { width: 100%; background-color: #e9ecef; border-radius: 5px; overflow: hidden; }
+        .progress { height: 24px; background-color: #0d6efd; border-radius: 5px; text-align: center; color: white; line-height: 24px; transition: width 0.3s ease-in-out; }
+        .pace-info { font-style: italic; color: #6c757d; margin-top: 10px; }
+        form { margin-bottom: 30px; }
+        input[type="text"], input[type="number"], input[type="date"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; color: white; cursor: pointer; }
+        .btn-submit { background-color: #28a745; }
+        .btn-update { background-color: #ffc107; color: #212529; }
+        .btn-delete { background-color: #dc3545; float: right; }
+        .actions { margin-top: 15px; display: flex; align-items: center; gap: 10px; }
+        .category-nav { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .category-nav a { text-decoration: none; color: #0d6efd; margin-right: 15px; padding: 5px 10px; border-radius: 4px; }
+        .category-nav a.active { background-color: #0d6efd; color: white; font-weight: bold; }
+        .material-category { float: left; background-color: #6c757d; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>学習進捗トラッカー</h1>
+
+        <h2>新しい教材を登録</h2>
+        <form action="{{ url_for('add_material') }}" method="POST">
+            教材名: <input type="text" name="name" required><br>
+            カテゴリ: <input type="text" name="category" placeholder="例: プログラミング, 英語, ..."><br>
+            総講義数/ページ数: <input type="number" name="total_units" min="1" required><br>
+            目標日: <input type="date" name="target_date"><br>
+            <button type="submit" class="btn-submit">登録</button>
+        </form>
+
+        <hr>
+
+        <h2>教材リスト</h2>
+
+        <div class="category-nav">
+            <a href="{{ url_for('index', selected_category='all') }}" class="{{ 'active' if current_category == 'all' }}">すべて</a>
+            {% for category in categories %}
+                <a href="{{ url_for('index', selected_category=category) }}" class="{{ 'active' if current_category == category }}">{{ category }}</a>
+            {% endfor %}
+        </div>
+
+        {% for material in materials %}
+            <div class="material">
+                <form action="{{ url_for('delete', material_id=material.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn-delete" onclick="return confirm('本当に削除しますか？');">削除</button>
+                </form>
+
+                <h3>
+                    <span class="material-category">{{ material.category }}</span>
+                    {{ material.name }}
+                    {% if material.target_date %}
+                        <span class="target-date"> (目標: {{ material.target_date.strftime('%Y年%m月%d日') }})</span>
+                    {% endif %}
+                </h3>
+                
+                <p>進捗: {{ material.completed_units }} / {{ material.total_units }}</p>
+
+                {% if material.total_units > 0 %}{% set percentage = (material.completed_units / material.total_units) * 100 %}{% else %}{% set percentage = 0 %}{% endif %}
+                <div class="progress-bar">
+                    <div class="progress" style="width: {{ percentage }}%;">{{ "%.1f"|format(percentage) }}%</div>
+                </div>
+
+                <p class="pace-info">ペース: {{ material.pace_info }}</p>
+
+                <div class="actions">
+                    <form action="{{ url_for('update', material_id=material.id) }}" method="POST" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="number" name="completed_units" value="{{ material.completed_units }}" min="0" max="{{ material.total_units }}" style="width: 80px; margin: 0;">
+                        <button type="submit" class="btn-update">進捗を更新</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <p>表示する教材がありません。</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

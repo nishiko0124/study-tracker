@@ -1,0 +1,9 @@
+# 仮想環境
+venv/
+
+# Pythonキャッシュ
+__pycache__/
+
+# データベースファイル
+*.db
+*.sqlite3
