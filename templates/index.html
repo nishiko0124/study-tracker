@@ -8,10 +8,11 @@
     <style>
         /* カラーパレットを変数として定義 */
         :root {
-          /* ベースカラー（茶色系） */
+            /* ベースカラー（茶色系） */
             --bg-color: #f7f3e9; /* 背景: ごく薄いクリーム色 */
             --card-color: #ffffff; /* カード: 白 */
             --text-color: #5d4037; /* テキスト: 濃い茶色 */
+            --text-color-dark: #4e342e; /* テキスト（濃）: さらに濃い茶色 */
             --subtle-text-color: #a1887f; /* サブテキスト: 明るい茶色 */
             --border-color: #d7ccc8; /* 罫線: さらに明るい茶色 */
 
@@ -65,8 +66,16 @@
         .material:hover {
             box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
-        .material h3 {
+
+        .material-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1em;
+        }
+        .material-header h3 {
             margin-top: 0;
+            margin-bottom: 0;
             display: flex;
             align-items: center;
         }
@@ -86,7 +95,7 @@
         input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.2);
         }
         button {
             padding: 12px 18px;
@@ -98,13 +107,14 @@
             font-family: var(--font-family);
             transition: background-color 0.2s ease;
         }
-        .btn-submit { background-color: var(--success-color); }
-        .btn-submit:hover { background-color: #27ae60; }
+
+        .btn-submit { background-color: var(--text-color); }
+        .btn-submit:hover { background-color: var(--text-color-dark); }
 
         .btn-update { background-color: var(--warning-color); color: var(--text-color); }
-        .btn-update:hover { background-color: #f39c12; }
+        .btn-update:hover { background-color: #ff8f00; }
 
-        .btn-delete { background-color: var(--danger-color); float: right; }
+        .btn-delete { background-color: var(--danger-color); }
         .btn-delete:hover { background-color: #c0392b; }
 
         /* カテゴリ */
@@ -119,22 +129,30 @@
         .progress { height: 24px; background-color: var(--accent-color); border-radius: 12px; text-align: center; color: white; line-height: 24px; transition: width 0.4s ease-in-out; }
         .pace-info { color: var(--subtle-text-color); margin-top: 10px; }
         .actions { margin-top: 20px; display: flex; align-items: center; gap: 10px; }
+
+        .flash-message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+        .flash-message.success { background-color: var(--success-color); }
+        .flash-message.danger { background-color: var(--danger-color); }
+        .flash-message.info { background-color: var(--subtle-text-color); }
     </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <div class="container">
         <h1>学習進捗トラッカー</h1>
-
-        <h2>新しい教材を登録</h2>
-        <form action="{{ url_for('add_material') }}" method="POST">
-            教材名: <input type="text" name="name" required><br>
-            カテゴリ: <input type="text" name="category" placeholder="例: プログラミング, 英語, ..."><br>
-            総講義数/ページ数: <input type="number" name="total_units" min="1" required><br>
-            目標日: <input type="date" name="target_date"><br>
-            <button type="submit" class="btn-submit">登録</button>
-        </form>
-
-        <hr>
 
         <h2>教材リスト</h2>
 
@@ -147,17 +165,18 @@
 
         {% for material in materials %}
             <div class="material">
-                <form action="{{ url_for('delete', material_id=material.id) }}" method="POST" style="display: inline;">
-                    <button type="submit" class="btn-delete" onclick="return confirm('本当に削除しますか？');">削除</button>
-                </form>
-
-                <h3>
-                    <span class="material-category">{{ material.category }}</span>
-                    {{ material.name }}
-                    {% if material.target_date %}
-                        <span class="target-date"> (目標: {{ material.target_date.strftime('%Y年%m月%d日') }})</span>
-                    {% endif %}
-                </h3>
+                <div class="material-header">
+                    <h3>
+                        <span class="material-category">{{ material.category }}</span>
+                        {{ material.name }}
+                        {% if material.target_date %}
+                            <span class="target-date"> (目標: {{ material.target_date.strftime('%Y年%m月%d日') }})</span>
+                        {% endif %}
+                    </h3>
+                    <form action="{{ url_for('delete', material_id=material.id) }}" method="POST" style="display: inline; margin-bottom: 0;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('本当に削除しますか？');">削除</button>
+                    </form>
+                </div>
 
                 <p>進捗: {{ material.completed_units }} / {{ material.total_units }}</p>
 
@@ -169,7 +188,7 @@
                 <p class="pace-info">ペース: {{ material.pace_info }}</p>
 
                 <div class="actions">
-                    <form action="{{ url_for('update', material_id=material.id) }}" method="POST" style="display: flex; align-items: center; gap: 10px;">
+                    <form action="{{ url_for('update', material_id=material.id) }}" method="POST" style="display: flex; align-items: center; gap: 10px; margin-bottom: 0;">
                         <input type="number" name="completed_units" value="{{ material.completed_units }}" min="0" max="{{ material.total_units }}" style="width: 80px; margin: 0;">
                         <button type="submit" class="btn-update">進捗を更新</button>
                     </form>
@@ -178,6 +197,16 @@
         {% else %}
             <p>表示する教材がありません。</p>
         {% endfor %}
-    </div>
+
+        <hr>
+        <h2>新しい教材を登録</h2>
+        <form action="{{ url_for('add_material') }}" method="POST">
+            教材名: <input type="text" name="name" required><br>
+            カテゴリ: <input type="text" name="category" placeholder="例: 科目, 教材, ..."><br>
+            総数: <input type="number" name="total_units" min="1" required><br>
+            目標日: <input type="date" name="target_date"><br>
+            <button type="submit" class="btn-submit">登録</button>
+        </form>
+        </div>
 </body>
 </html>
