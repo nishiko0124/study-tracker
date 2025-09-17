@@ -1,37 +1,28 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash # flashを追加
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-should-be-more-complex'
+# flashメッセージのためにSECRET_KEYを設定
+app.config['SECRET_KEY'] = 'your-secret-key-should-be-more-complex' # 実際にはもっと複雑な文字列にしてください
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# データベースの変更点: completed_units を文字列型に
+
 class StudyMaterial(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     total_units = db.Column(db.Integer, nullable=False)
-    # 変更: completed_units を文字列型(完了したユニット番号をカンマ区切りで保存)に変更
-    completed_units = db.Column(db.String(500), default='')
+    completed_units = db.Column(db.Integer, default=0)
     target_date = db.Column(db.Date, nullable=True)
     category = db.Column(db.String(50), nullable=False, default='未分類')
 
     def __repr__(self):
         return f'<StudyMaterial {self.name}>'
-
-    # 進捗の計算方法を変更
-    @property
-    def completed_count(self):
-        # カンマ区切りの文字列をリストに変換し、要素数を返す
-        if not self.completed_units:
-            return 0
-        # 重複を考慮してset()を使用
-        return len(set(self.completed_units.split(',')))
 
     @property
     def pace_info(self):
@@ -40,7 +31,7 @@ class StudyMaterial(db.Model):
 
         today = date.today()
         remaining_days = (self.target_date - today).days
-        remaining_units = self.total_units - self.completed_count
+        remaining_units = self.total_units - self.completed_units
 
         if remaining_units <= 0:
             return "🎉 完了！"
@@ -95,25 +86,16 @@ def add_material():
 @app.route('/update/<int:material_id>', methods=['POST'])
 def update(material_id):
     material = StudyMaterial.query.get_or_404(material_id)
-    new_unit = request.form.get('completed_unit') # フォーム入力欄の名前を変更
+    new_completed = request.form.get('completed_units')
 
-    if new_unit and new_unit.isdigit():
-        unit_number = int(new_unit)
-        if 1 <= unit_number <= material.total_units:
-            # 既に登録済みのユニットリストを取得
-            completed_list = material.completed_units.split(',') if material.completed_units else []
-            # 新しいユニット番号を追加
-            completed_list.append(str(unit_number))
-            # 重複を削除してソート
-            completed_list = sorted(list(set(completed_list)), key=int)
-            # カンマ区切りの文字列に戻して保存
-            material.completed_units = ','.join(completed_list)
+    if new_completed and new_completed.isdigit():
+        completed = int(new_completed)
+        if 0 <= completed <= material.total_units:
+            material.completed_units = completed
             db.session.commit()
             flash("進捗を更新しました！", "success")
         else:
-            flash(f"ユニット番号は1から{material.total_units}の範囲で入力してください。", "danger")
-    else:
-        flash("有効なユニット番号を入力してください。", "danger")
+            flash("???", "danger")
 
     return redirect(request.referrer or url_for('index'))
 
@@ -135,7 +117,5 @@ def init_db_command():
 
 if __name__ == '__main__':
     with app.app_context():
-        # データベースを初期化（既存のテーブルは削除されるので注意）
-        db.drop_all() # 既存のテーブルを一度削除
-        db.create_all() # 新しいテーブルを作成
+        db.create_all()
     app.run(debug=True)
