@@ -185,9 +185,10 @@
                     </form>
                 </div>
 
-                <p>進捗: {{ material.completed_units }} / {{ material.total_units }}</p>
+                <p>進捗: {{ material.completed_count }} / {{ material.total_units }}</p>
+                <small class="text-muted">（{{ material.completed_units|replace(',', ', ') }}）</small>
 
-                {% if material.total_units > 0 %}{% set percentage = (material.completed_units / material.total_units) * 100 %}{% else %}{% set percentage = 0 %}{% endif %}
+                {% if material.total_units > 0 %}{% set percentage = (material.completed_count / material.total_units) * 100 %}{% else %}{% set percentage = 0 %}{% endif %}
                 <div class="progress-bar">
                     <div class="progress" style="width: {{ percentage }}%;">{{ "%.1f"|format(percentage) }}%</div>
                 </div>
@@ -196,8 +197,8 @@
 
                 <div class="actions">
                     <form action="{{ url_for('update', material_id=material.id) }}" method="POST" style="display: flex; align-items: center; gap: 10px; margin-bottom: 0;">
-                        <input type="number" name="completed_units" value="{{ material.completed_units }}" min="0" max="{{ material.total_units }}" style="width: 80px; margin: 0;">
-                        <button type="submit" class="btn-update">進捗を更新</button>
+                        <input type="number" name="completed_unit" placeholder="ユニット番号" min="1" max="{{ material.total_units }}" style="width: 80px; margin: 0;">
+                        <button type="submit" class="btn-update">進捗を記録</button>
                     </form>
                 </div>
             </div>
