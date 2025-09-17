@@ -5,24 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>学習進捗トラッカー</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
         /* カラーパレットを変数として定義 */
         :root {
-            --bg-color: #f4f7f9;
-            --card-color: #ffffff;
-            --text-color: #34495e;
-            --subtle-text-color: #7f8c8d;
-            --border-color: #e0e5ea;
-            --accent-color: #3498db;
-            --accent-color-dark: #2980b9;
-            --success-color: #2ecc71;
-            --warning-color: #f1c40f;
-            --danger-color: #e74c3c;
-            --font-family: 'Noto Sans JP', sans-serif;
+          /* ベースカラー（茶色系） */
+            --bg-color: #f7f3e9; /* 背景: ごく薄いクリーム色 */
+            --card-color: #ffffff; /* カード: 白 */
+            --text-color: #5d4037; /* テキスト: 濃い茶色 */
+            --subtle-text-color: #a1887f; /* サブテキスト: 明るい茶色 */
+            --border-color: #d7ccc8; /* 罫線: さらに明るい茶色 */
+
+            /* アクセントカラー（赤系） */
+            --accent-color: #d32f2f; /* アクセント: 落ち着いた赤 */
+            --accent-color-dark: #b71c1c; /* アクセント（濃）: さらに濃い赤 */
+            --danger-color: #d32f2f; /* 削除ボタン: アクセントと同じ赤 */
+
+            /* その他 */
+            --success-color: #388e3c; /* 成功ボタン: テーマに合う緑 */
+            --warning-color: #ffa000; /* 更新ボタン: テーマに合うアンバー */
+            --font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
         }
 
         /* 基本設定 */
