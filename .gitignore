@@ -7,3 +7,5 @@ __pycache__/
 # データベースファイル
 *.db
 *.sqlite3
+
+.DS_Store
