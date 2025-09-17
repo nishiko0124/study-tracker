@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学習進捗トラッカー</title>
+    <title>まなび記録帳</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         /* カラーパレットを変数として定義 */
@@ -24,7 +28,9 @@
             /* その他 */
             --success-color: #388e3c; /* 成功ボタン: テーマに合う緑 */
             --warning-color: #ffa000; /* 更新ボタン: テーマに合うアンバー */
-            --font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+
+            /* ▼▼▼ 変更 ▼▼▼ */
+            --font-family: 'M PLUS Rounded 1c', sans-serif;
         }
 
         /* 基本設定 */
@@ -78,6 +84,7 @@
             margin-bottom: 0;
             display: flex;
             align-items: center;
+            font-weight: 700; /* タイトルを少し太く */
         }
 
         /* フォーム要素 */
@@ -152,7 +159,7 @@
     {% endwith %}
 
     <div class="container">
-        <h1>学習進捗トラッカー</h1>
+        <h1>まなび記録帳</h1>
 
         <h2>教材リスト</h2>
 
@@ -207,6 +214,6 @@
             目標日: <input type="date" name="target_date"><br>
             <button type="submit" class="btn-submit">登録</button>
         </form>
-        </div>
+    </div>
 </body>
 </html>
