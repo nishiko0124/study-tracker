@@ -95,7 +95,7 @@ def update(material_id):
             db.session.commit()
             flash("進捗を更新しました！", "success")
         else:
-            flash("無効な数値です。", "danger")
+            flash("???", "danger")
 
     return redirect(request.referrer or url_for('index'))
 
