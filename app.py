@@ -1,28 +1,37 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash # flashを追加
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-# flashメッセージのためにSECRET_KEYを設定
-app.config['SECRET_KEY'] = 'your-secret-key-should-be-more-complex' # 実際にはもっと複雑な文字列にしてください
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SECRET_KEY'] = 'your-secret-key-should-be-more-complex'
+# データベースの接続設定をRender用に変更
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f"sqlite:///{os.path.join(basedir, 'app.db')}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-
+# --- ▼▼▼ データベースモデルの変更 ▼▼▼ ---
 class StudyMaterial(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     total_units = db.Column(db.Integer, nullable=False)
-    completed_units = db.Column(db.Integer, default=0)
+    # 完了したユニット番号をカンマ区切りの文字列で保存 (例: "1,5,10")
+    completed_list = db.Column(db.Text, default='')
     target_date = db.Column(db.Date, nullable=True)
     category = db.Column(db.String(50), nullable=False, default='未分類')
 
     def __repr__(self):
         return f'<StudyMaterial {self.name}>'
+
+    # --- ▼▼▼ 完了数を計算するプロパティを追加 ▼▼▼ ---
+    @property
+    def completed_units(self):
+        if not self.completed_list:
+            return 0
+        # カンマで区切って空白を除いたリストを作り、その長さを返す
+        return len([item for item in self.completed_list.split(',') if item.strip()])
 
     @property
     def pace_info(self):
@@ -40,8 +49,12 @@ class StudyMaterial(db.Model):
         if remaining_days == 0:
             return f"今日中に残り {remaining_units} を終わらせましょう！"
 
-        pace = remaining_units / remaining_days
-        return f"残り{remaining_days}日 (1日あたり約 {pace:.1f} のペース)"
+        # remaining_daysが0より大きいことを確認
+        if remaining_days > 0:
+            pace = remaining_units / remaining_days
+            return f"残り{remaining_days}日 (1日あたり約 {pace:.1f} のペース)"
+        else:
+            return "ペース計算不可"
 
 
 @app.route('/', defaults={'selected_category': 'all'})
@@ -82,20 +95,25 @@ def add_material():
     flash(f"「{material_name}」を登録しました！", "success")
     return redirect(url_for('index'))
 
-
+# --- ▼▼▼ 進捗更新ロジックの変更 ▼▼▼ ---
 @app.route('/update/<int:material_id>', methods=['POST'])
 def update(material_id):
     material = StudyMaterial.query.get_or_404(material_id)
-    new_completed = request.form.get('completed_units')
+    # フォームからテキストとして受け取る
+    new_completed_list = request.form.get('completed_list')
 
-    if new_completed and new_completed.isdigit():
-        completed = int(new_completed)
-        if 0 <= completed <= material.total_units:
-            material.completed_units = completed
+    if new_completed_list is not None:
+        # 入力された番号を検証・整形する
+        try:
+            # カンマやスペースで区切られた数値をリストに変換
+            items = [str(int(i.strip())) for i in new_completed_list.replace(',', ' ').split() if i.strip().isdigit()]
+            # 重複を除いてソート
+            unique_items = sorted(list(set(items)), key=int)
+            material.completed_list = ','.join(unique_items)
             db.session.commit()
             flash("進捗を更新しました！", "success")
-        else:
-            flash("???", "danger")
+        except ValueError:
+            flash("数値として認識できない入力がありました。", "danger")
 
     return redirect(request.referrer or url_for('index'))
 
@@ -108,13 +126,14 @@ def delete(material_id):
     flash(f"「{material.name}」を削除しました。", "info")
     return redirect(request.referrer or url_for('index'))
 
-
+# --- ▼▼▼ データベース初期化のためのコマンド（変更なし）▼▼▼ ---
 @app.cli.command('init-db')
 def init_db_command():
+    """データベースを初期化します。"""
     db.create_all()
     print('データベースを初期化しました。')
 
-
+# --- ▼▼▼ ローカル実行時のデータベース作成（変更なし）▼▼▼ ---
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

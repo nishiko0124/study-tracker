@@ -10,139 +10,60 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* カラーパレットを変数として定義 */
         :root {
-            /* ベースカラー（茶色系） */
-            --bg-color: #f7f3e9; /* 背景: ごく薄いクリーム色 */
-            --card-color: #ffffff; /* カード: 白 */
-            --text-color: #5d4037; /* テキスト: 濃い茶色 */
-            --text-color-dark: #4e342e; /* テキスト（濃）: さらに濃い茶色 */
-            --subtle-text-color: #a1887f; /* サブテキスト: 明るい茶色 */
-            --border-color: #d7ccc8; /* 罫線: さらに明るい茶色 */
-
-            /* アクセントカラー（赤系） */
-            --accent-color: #d32f2f; /* アクセント: 落ち着いた赤 */
-            --accent-color-dark: #b71c1c; /* アクセント（濃）: さらに濃い赤 */
-            --danger-color: #d32f2f; /* 削除ボタン: アクセントと同じ赤 */
-
-            /* その他 */
-            --success-color: #388e3c; /* 成功ボタン: テーマに合う緑 */
-            --warning-color: #ffa000; /* 更新ボタン: テーマに合うアンバー */
-
-            /* ▼▼▼ 変更 ▼▼▼ */
+            --bg-color: #f7f3e9; --card-color: #ffffff; --text-color: #5d4037;
+            --text-color-dark: #4e342e; --subtle-text-color: #a1887f; --border-color: #d7ccc8;
+            --accent-color: #d32f2f; --accent-color-dark: #b71c1c; --danger-color: #d32f2f;
+            --success-color: #388e3c; --warning-color: #ffa000;
             --font-family: 'M PLUS Rounded 1c', sans-serif;
         }
-
-        /* 基本設定 */
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0 auto;
-            padding: 20px;
-            max-width: 800px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color);
+            margin: 0 auto; padding: 20px; max-width: 800px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
         }
-        h1, h2 {
-            font-weight: 700;
-        }
-        hr {
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 40px 0;
-        }
-
-        /* コンテナ */
+        h1, h2 { font-weight: 700; }
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
         .container {
-            background-color: var(--card-color);
-            padding: 20px 30px;
-            border-radius: 12px;
+            background-color: var(--card-color); padding: 20px 30px; border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.08);
         }
-
-        /* 各教材カード */
         .material {
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
+            border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px; border-radius: 10px;
             transition: box-shadow 0.2s ease-in-out;
         }
-        .material:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-        }
-
+        .material:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
         .material-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1em;
+            display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1em;
         }
-        .material-header h3 {
-            margin-top: 0;
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-            font-weight: 700; /* タイトルを少し太く */
-        }
-
-        /* フォーム要素 */
+        .material-header h3 { margin-top: 0; margin-bottom: 0; display: flex; align-items: center; font-weight: 700; }
         form { margin-bottom: 30px; }
         input[type="text"], input[type="number"], input[type="date"] {
-            width: calc(100% - 24px);
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-family: var(--font-family);
-            font-size: 1em;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            width: calc(100% - 24px); padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-family: var(--font-family); font-size: 1em; transition: border-color 0.2s, box-shadow 0.2s;
         }
-        input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.2);
-        }
+        input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.2); }
         button {
-            padding: 12px 18px;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-weight: 700;
-            font-family: var(--font-family);
-            transition: background-color 0.2s ease;
+            padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer;
+            font-weight: 700; font-family: var(--font-family); transition: background-color 0.2s ease;
         }
-
         .btn-submit { background-color: var(--text-color); }
         .btn-submit:hover { background-color: var(--text-color-dark); }
-
         .btn-update { background-color: var(--warning-color); color: var(--text-color); }
         .btn-update:hover { background-color: #ff8f00; }
-
         .btn-delete { background-color: var(--danger-color); }
         .btn-delete:hover { background-color: #c0392b; }
-
-        /* カテゴリ */
         .category-nav { margin: 20px 0; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 10px; }
         .category-nav a { text-decoration: none; color: var(--accent-color); padding: 6px 12px; border-radius: 15px; background-color: #ecf0f1; transition: background-color 0.2s, color 0.2s; }
         .category-nav a.active, .category-nav a:hover { background-color: var(--accent-color); color: white; font-weight: 700; }
         .material-category { background-color: var(--subtle-text-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; margin-right: 10px; font-weight: 400; }
-
-        /* その他 */
         .target-date { font-size: 0.9em; color: var(--subtle-text-color); font-weight: 400; margin-left: 10px; }
         .progress-bar { width: 100%; background-color: #ecf0f1; border-radius: 12px; overflow: hidden; }
         .progress { height: 24px; background-color: var(--accent-color); border-radius: 12px; text-align: center; color: white; line-height: 24px; transition: width 0.4s ease-in-out; }
         .pace-info { color: var(--subtle-text-color); margin-top: 10px; }
         .actions { margin-top: 20px; display: flex; align-items: center; gap: 10px; }
-
         .flash-message {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
+            padding: 15px; margin-bottom: 20px; border-radius: 8px;
+            color: white; font-weight: bold;
         }
         .flash-message.success { background-color: var(--success-color); }
         .flash-message.danger { background-color: var(--danger-color); }
@@ -160,7 +81,6 @@
 
     <div class="container">
         <h1>まなび記録帳</h1>
-
         <h2>教材リスト</h2>
 
         <div class="category-nav">
@@ -186,17 +106,16 @@
                 </div>
 
                 <p>進捗: {{ material.completed_units }} / {{ material.total_units }}</p>
-
                 {% if material.total_units > 0 %}{% set percentage = (material.completed_units / material.total_units) * 100 %}{% else %}{% set percentage = 0 %}{% endif %}
                 <div class="progress-bar">
                     <div class="progress" style="width: {{ percentage }}%;">{{ "%.1f"|format(percentage) }}%</div>
                 </div>
-
-                <p class="pace-info">ペース: {{ material.pace_info }}</p>
+                <p class="pace-info">{{ material.pace_info }}</p>
 
                 <div class="actions">
-                    <form action="{{ url_for('update', material_id=material.id) }}" method="POST" style="display: flex; align-items: center; gap: 10px; margin-bottom: 0;">
-                        <input type="number" name="completed_units" value="{{ material.completed_units }}" min="0" max="{{ material.total_units }}" style="width: 80px; margin: 0;">
+                    <form action="{{ url_for('update', material_id=material.id) }}" method="POST" style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 0;">
+                        <div>完了した番号 (カンマやスペース区切り):</div>
+                        <input type="text" name="completed_list" value="{{ material.completed_list }}" placeholder="例: 1, 5, 10-15" style="width: 300px; margin: 0;">
                         <button type="submit" class="btn-update">進捗を更新</button>
                     </form>
                 </div>
